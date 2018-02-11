@@ -1,0 +1,19 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0px;
+  padding: 0px;
+  font-family: sans-serif;
+}
+
+.tile {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin: 2px;
+  background: #1baaeb;
+  color: #fff;
+  height: 50px;
+}

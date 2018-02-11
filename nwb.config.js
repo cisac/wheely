@@ -3,10 +3,10 @@ module.exports = {
   npm: {
     esModules: true,
     umd: {
-      global: 'Wheely',
+      global: 'wheely',
       externals: {
-        react: 'React'
-      }
-    }
-  }
-}
+        react: 'React',
+      },
+    },
+  },
+};

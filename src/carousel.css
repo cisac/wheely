@@ -1,0 +1,75 @@
+.carouselWrapper {
+  position: relative;
+  overflow: hidden;
+  padding: 20px 0;
+  outline: none;
+}
+
+.slider-btn {
+  position: absolute;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 40px;
+
+  cursor: pointer;
+  background-color: transparent;
+  color: #00558B;
+  opacity: .3;
+}
+
+.slider-btn:hover {
+  opacity: 1;
+}
+
+.slider-btn.slider-prev {
+  left: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.slider-btn.slider-next {
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+
+.slider-btn.slider-up {
+  top: 0px;
+  height: 20px;
+  width: 100%;
+}
+
+.slider-btn.slider-down {
+  bottom: 0px;
+  height: 20px;
+  width: 100%;
+}
+
+.slider-btn > i {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  padding: 3px;  
+}
+
+i.slider-prev {
+  transform: rotate(135deg);
+  -webkit-transform: rotate(135deg);
+}
+
+i.slider-next {
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+}
+
+i.slider-up {
+  transform: rotate(-135deg);
+  -webkit-transform: rotate(-135deg);
+}
+
+i.slider-down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}

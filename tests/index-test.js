@@ -1,23 +1,37 @@
-import expect from 'expect'
-import React from 'react'
-import {render, unmountComponentAtNode} from 'react-dom'
+import expect from 'expect';
+import React from 'react';
+import { render, unmountComponentAtNode } from 'react-dom';
 
-import Component from 'src/'
+import Carousel from 'src/';
 
-describe('Component', () => {
-  let node
+const CarouselTest = () => {
+  const settings = {
+    pageLength: 1,
+    infinite: true,
+  };
+
+  return (
+    <Carousel {...settings}>
+      <div>1</div>
+      <div>2</div>
+      <div>3</div>
+    </Carousel>
+  );
+};
+
+describe('Carousel', () => {
+  let node;
 
   beforeEach(() => {
-    node = document.createElement('div')
-  })
+    node = document.createElement('div');
+  });
 
   afterEach(() => {
-    unmountComponentAtNode(node)
-  })
+    unmountComponentAtNode(node);
+  });
 
-  it('displays a welcome message', () => {
-    render(<Component/>, node, () => {
-      expect(node.innerHTML).toContain('Welcome to React components')
-    })
-  })
-})
+  it('render without crashing', () => {
+    // TODO: fix warning - using React.Fragment prints warning
+    render(<CarouselTest />, node);
+  });
+});
