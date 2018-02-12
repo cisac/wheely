@@ -1,5 +1,101 @@
 import React from 'react';
-import './carousel.css';
+
+const sxCarouselWrapper = {
+  position: 'relative',
+  overflow: 'hidden',
+  padding: '20px 0',
+  outline: 'none',
+};
+
+const sxNav = {
+  position: 'absolute',
+
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'center',
+
+  width: '40px',
+
+  cursor: 'pointer',
+  backgroundColor: 'transparent',
+  color: '#00558B',
+  opacity: '.3',
+};
+
+const sliderPrev = {
+  left: 0,
+  top: 0,
+  bottom: 0,
+};
+
+const sliderNext = {
+  right: 0,
+  top: 0,
+  bottom: 0,
+};
+
+const sliderUp = {
+  top: '0px',
+  height: '20px',
+  width: '100%',
+};
+
+const sliderDown = {
+  bottom: '0px',
+  height: '20px',
+  width: '100%',
+};
+
+const sliderBtnI = {
+  border: 'solid black',
+  borderWidth: '0 3px 3px 0',
+  padding: '3px',
+};
+
+const sliderBtnIprev = {
+  transform: 'rotate(135deg)',
+  // -webkit-transform: rotate(135deg),
+};
+
+const sliderBtnInext = {
+  transform: 'rotate(-45deg)',
+  // -webkit-transform: rotate(-45deg),
+};
+
+const sliderBtnIup = {
+  transform: 'rotate(-135deg)',
+  // -webkit-transform: rotate(-135deg),
+};
+
+const sliderBtnIdown = {
+  transform: 'rotate(45deg)',
+  // -webkit-transform: rotate(45deg),
+};
+
+const NavButton = ({ onClickHandler, classes }) => {
+  let divStyle = sxNav;
+  let iStyle = sliderBtnI;
+
+  if (classes === 'slider-up') {
+    divStyle = { ...{ ...sxNav }, ...{ ...sliderUp } };
+    iStyle = { ...{ ...sliderBtnI }, ...{ ...sliderBtnIup } };
+  } else if (classes === 'slider-prev') {
+    divStyle = { ...{ ...sxNav }, ...{ ...sliderPrev } };
+    iStyle = { ...{ ...sliderBtnI }, ...{ ...sliderBtnIprev } };
+  } else if (classes === 'slider-next') {
+    divStyle = { ...{ ...sxNav }, ...{ ...sliderNext } };
+    iStyle = { ...{ ...sliderBtnI }, ...{ ...sliderBtnInext } };
+  } else if (classes === 'slider-down') {
+    divStyle = { ...{ ...sxNav }, ...{ ...sliderDown } };
+    iStyle = { ...{ ...sliderBtnI }, ...{ ...sliderBtnIdown } };
+  }
+
+  return (
+    <div style={divStyle} onClick={onClickHandler}>
+      <i style={iStyle} />
+    </div>
+  );
+};
 
 class CarouselControls extends React.Component {
   handleKeyPress = event => {
@@ -22,24 +118,21 @@ class CarouselControls extends React.Component {
 
     const btnClasses = {
       previous: vertical ? 'slider-up' : 'slider-prev',
-      next: vertical ? 'slider-down' : 'slider-next'
+      next: vertical ? 'slider-down' : 'slider-next',
     };
 
     return (
       <div
         className="carouselWrapper"
+        style={sxCarouselWrapper}
         tabIndex="0"
         onKeyDown={e => {
           this.handleKeyPress(e);
         }}
       >
         {children}
-        <div className={`slider-btn ${btnClasses.previous}`} onClick={previous}>
-          <i className={btnClasses.previous} />
-        </div>
-        <div className={`slider-btn ${btnClasses.next}`} onClick={next}>
-          <i className={btnClasses.next} />
-        </div>
+        <NavButton onClickHandler={previous} classes={btnClasses.previous} />
+        <NavButton onClickHandler={next} classes={btnClasses.next} />
       </div>
     );
   }
