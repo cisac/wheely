@@ -22,6 +22,11 @@ class Demo extends Component {
           <SingleItem name={'Single item'} />
           <MultipleItems name={'Multiple items infinite'} pageLength={3} />
           <MultipleItems
+            name={'Multiple items infinite selectedSlideOffset=25%'}
+            pageLength={3}
+            selectedSlideOffset={0.25}
+          />
+          <MultipleItems
             name={'Multiple items'}
             infinite={false}
             pageLength={4}

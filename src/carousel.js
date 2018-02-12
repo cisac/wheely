@@ -8,7 +8,7 @@ function CarouselStateHOC(Controls) {
     constructor(props) {
       super(props);
       this.state = {
-        index: 0
+        index: 0,
       };
       this.animating = false;
     }
@@ -76,10 +76,10 @@ function CarouselStateHOC(Controls) {
       return (
         <Controls vertical={vertical} previous={this.previous} next={this.next}>
           <Slider
+            {...this.props}
             index={index}
             speed={speed}
             handleTransitionEnd={this.handleTransitionEnd}
-            {...this.props}
           >
             {children}
           </Slider>
@@ -95,7 +95,7 @@ function CarouselStateHOC(Controls) {
     speed: PropTypes.number.isRequired,
     autoplay: PropTypes.bool,
     autoplayTimeout: PropTypes.number,
-    vertical: PropTypes.bool
+    vertical: PropTypes.bool,
   };
 
   Carousel.defaultProps = {
@@ -104,7 +104,7 @@ function CarouselStateHOC(Controls) {
     variableSize: false,
     speed: 300,
     autoplayTimeout: 3000,
-    vertical: false
+    vertical: false,
   };
 
   return Carousel;

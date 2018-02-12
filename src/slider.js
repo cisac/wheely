@@ -32,8 +32,7 @@ const makeSlides = ({
       dataIndex={`${key(i)}`}
       updateSize={updateSize}
     >
-      {child}
-      {/* {React.cloneElement(child, { 'data-active': index === key(i) })} */}
+      {React.cloneElement(child, { 'data-active': index === key(i) })}
     </Slide>
   ));
 };
@@ -167,12 +166,29 @@ class Slider extends React.Component {
   }
 
   getFixedSizes() {
-    const { children, index, pageLength, infinite, vertical } = this.props;
+    const {
+      children,
+      index,
+      pageLength,
+      infinite,
+      vertical,
+      selectedSlideOffset,
+    } = this.props;
+
     const length = children.length;
     const added = length; // TODO: should depend on slide size (width || height)
 
+    const sliderSize = (infinite ? 300 : 100) * length / pageLength;
+
     const slideSize = 100 / (infinite ? length + 2 * added : length);
-    const offset = -index * slideSize - (infinite ? slideSize * length : 0);
+
+    const startOffset =
+      infinite && pageLength > 1 && selectedSlideOffset
+        ? slideSize * pageLength * selectedSlideOffset - slideSize / 2
+        : 0;
+
+    const offset =
+      -index * slideSize - (infinite ? slideSize * length : 0) + startOffset;
 
     const slideHeight = getSize(vertical, this.slides[0]);
     const trackHeight = slideHeight ? slideHeight * pageLength + 'px' : '100%';
@@ -180,7 +196,7 @@ class Slider extends React.Component {
     return {
       offset,
       trackSize: vertical ? trackHeight : '100%',
-      sliderSize: (infinite ? 300 : 100) * length / pageLength + '%',
+      sliderSize: sliderSize + '%',
       slideSize,
     };
   }
@@ -242,6 +258,7 @@ class Slider extends React.Component {
 
 Slider.propTypes = {
   index: PropTypes.number.isRequired,
+  selectedSlideOffset: PropTypes.number,
   infinite: PropTypes.bool.isRequired,
   speed: PropTypes.number.isRequired,
   vertical: PropTypes.bool,
@@ -250,6 +267,7 @@ Slider.propTypes = {
 
 Slider.defaultProps = {
   index: 0,
+  selectedSlideOffset: 0,
   infinite: true,
   speed: 300,
   vertical: false,

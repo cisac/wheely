@@ -17,3 +17,7 @@ body {
   color: #fff;
   height: 50px;
 }
+
+.slide-active {
+  /* border: solid 1px blue; */
+}
