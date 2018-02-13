@@ -1,6 +1,6 @@
 # Wheely
 
-[![Travis][build-badge]][build]
+[![Build Status](https://travis-ci.org/cisac/wheely.svg?branch=master)](https://travis-ci.org/cisac/wheely)
 [![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
@@ -8,11 +8,7 @@ React carousel component.
 
 Install
 -
-`npm install`
-
-Usage
--
-`npm start`
+`npm install wheely --save`
 
 Example usage
 -------------
@@ -50,11 +46,8 @@ Todo
 -
 - [ ] Write tests
 
-[build-badge]: https://img.shields.io/travis/user/repo/master.png?style=flat-square
-[build]: https://travis-ci.org/user/repo
-
 [npm-badge]: https://img.shields.io/npm/v/npm-package.png?style=flat-square
-[npm]: https://www.npmjs.org/package/npm-package
+[npm]: https://www.npmjs.org/package/wheely
 
-[coveralls-badge]: https://img.shields.io/coveralls/user/repo/master.png?style=flat-square
-[coveralls]: https://coveralls.io/github/user/repo
+[coveralls-badge]: https://img.shields.io/coveralls/cisac/wheely/master.png?style=flat-square
+[coveralls]: https://coveralls.io/github/cisac/wheely
