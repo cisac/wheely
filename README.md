@@ -1,7 +1,6 @@
 # Wheely
 
 [![Build Status](https://travis-ci.org/cisac/wheely.svg?branch=master)](https://travis-ci.org/cisac/wheely)
-[![npm package][npm-badge]][npm]
 [![Coveralls][coveralls-badge]][coveralls]
 
 React carousel component.

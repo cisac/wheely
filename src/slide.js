@@ -9,12 +9,12 @@ class Slide extends Component {
       addRef,
       slides,
       idx,
-      dataIndex
+      dataIndex,
     } = this.props;
 
     return (
       <div
-        tabIndex={-1}
+        // tabIndex={-1}
         className={className}
         style={slideStyle}
         data-index={dataIndex}

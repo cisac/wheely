@@ -20,6 +20,7 @@ const makeSlides = ({
   slides,
   index,
   updateSize,
+  highlightSelection,
 }) => {
   return children.map((child, i) => (
     <Slide
@@ -47,6 +48,7 @@ const getSliderChildren = ({
   slides,
   index,
   updateSize,
+  highlightSelection,
 }) => {
   const view = makeSlides({
     children: childrenElements,
@@ -56,6 +58,7 @@ const getSliderChildren = ({
     slides: slides,
     index,
     updateSize,
+    highlightSelection,
   });
   const prefix = !infinite
     ? null
@@ -64,6 +67,7 @@ const getSliderChildren = ({
         key: val => val - added,
         slideStyle: sx.slide,
         index,
+        highlightSelection,
       });
   const sufix = !infinite
     ? null
@@ -72,6 +76,7 @@ const getSliderChildren = ({
         key: val => length + val,
         slideStyle: sx.slide,
         index,
+        highlightSelection,
       });
 
   return (
@@ -100,7 +105,13 @@ class Slider extends React.Component {
 
     this.ro = new ResizeObserver(this.resizeObserverCb);
 
-    this.ro.observe(this.slider);
+    if (this.slider) {
+      this.trackParent = this.track.parentNode;
+
+      this.ro.observe(this.slider);
+      this.ro.observe(this.trackParent);
+    }
+
     this.slides.forEach(slide => this.ro.observe(slide));
   }
 
@@ -117,34 +128,61 @@ class Slider extends React.Component {
   }
 
   resizeObserverCb = (entries, observer) => {
-    this.forceUpdate();
+    const { resizeObserver = w => {} } = this.props;
+
+    let sliderWidth = 0;
+    for (const entry of entries) {
+      const { width } = entry.contentRect;
+
+      if (entry.target === this.slider) {
+        sliderWidth = width;
+      }
+    }
+
+    if (sliderWidth) {
+      this.forceUpdate(() => resizeObserver(sliderWidth));
+    } else {
+      this.forceUpdate();
+    }
   };
 
   handleTransitionEnd = e => {
     const { handleTransitionEnd } = this.props;
-    if (handleTransitionEnd) {
+    if (handleTransitionEnd instanceof Function) {
       handleTransitionEnd(e);
     }
   };
 
   getVariableSizes() {
-    const { children, index, infinite, vertical } = this.props;
+    const {
+      children,
+      index,
+      infinite,
+      vertical,
+      selectedSlideOffset,
+    } = this.props;
     const length = children.length;
     const added = length; // TODO: should depend on slide size (width, height)
+
+    let prefixSize = 0;
+    if (infinite) {
+      prefixSize = this.slides
+        .slice(-added)
+        .reduce(
+          (currentSum, slide) => currentSum - getSize(vertical, slide),
+          0
+        );
+    }
+
+    const trackOffset =
+      getSize(vertical, this.trackParent) * selectedSlideOffset;
 
     const totalSize = this.slides.reduce(
       (currentSum, slide) => currentSum + getSize(vertical, slide),
       0
     );
 
-    const prefixSize = !infinite
-      ? 0
-      : this.slides
-          .slice(-added)
-          .reduce(
-            (currentSum, slide) => currentSum - getSize(vertical, slide),
-            0
-          );
+    prefixSize = prefixSize + trackOffset;
 
     const indexes =
       index >= 0
@@ -157,11 +195,13 @@ class Slider extends React.Component {
 
     offset = index < 0 ? prefixSize + offset : prefixSize - offset;
 
+    const slideSize = this.slides ? getSize(vertical, this.slides[index]) : 0;
     return {
       offset,
-      trackSize: totalSize ? `${totalSize}px` : '100%',
+      trackSize: totalSize ? `${totalSize + trackOffset}px` : '100%',
       sliderSize: '100%',
-      slideSize: null,
+      slideSize,
+      trackOffset,
     };
   }
 
@@ -182,13 +222,13 @@ class Slider extends React.Component {
 
     const slideSize = 100 / (infinite ? length + 2 * added : length);
 
-    const startOffset =
-      infinite && pageLength > 1 && selectedSlideOffset
-        ? slideSize * pageLength * selectedSlideOffset - slideSize / 2
+    const trackOffset =
+      pageLength > 1 && selectedSlideOffset
+        ? slideSize * pageLength * selectedSlideOffset //- slideSize / 2
         : 0;
 
     const offset =
-      -index * slideSize - (infinite ? slideSize * length : 0) + startOffset;
+      -index * slideSize - (infinite ? slideSize * length : 0) + trackOffset;
 
     const slideHeight = getSize(vertical, this.slides[0]);
     const trackHeight = slideHeight ? slideHeight * pageLength + 'px' : '100%';
@@ -198,30 +238,35 @@ class Slider extends React.Component {
       trackSize: vertical ? trackHeight : '100%',
       sliderSize: sliderSize + '%',
       slideSize,
+      trackOffset,
     };
   }
 
   getStyles() {
-    const { speed, variableSize, vertical } = this.props;
+    const { speed, variableSize, vertical, styleSelected } = this.props;
 
-    const { offset, trackSize, sliderSize, slideSize } = variableSize
-      ? this.getVariableSizes()
-      : this.getFixedSizes();
+    const {
+      offset,
+      trackSize,
+      sliderSize,
+      slideSize,
+      trackOffset,
+    } = variableSize ? this.getVariableSizes() : this.getFixedSizes();
 
     const sx = cssSlider({
       speed,
       offset: offset + (variableSize ? 'px' : '%'),
       trackSize,
       sliderSize,
-      slideSize,
-      flexItemStyle: variableSize ? 'none' : 'auto',
+      flexItemStyle: variableSize ? 'none' : '1',
+      styleSelected,
       vertical,
     });
-    return sx;
+    return { sx, offset, slideSize, trackOffset };
   }
 
   getChildren(sx) {
-    const { children, index, infinite } = this.props;
+    const { children, index, infinite, highlightSelection } = this.props;
     const length = children.length;
     const added = length; // TODO: should depend on slide size (width || height)
 
@@ -236,22 +281,82 @@ class Slider extends React.Component {
       index,
       addRef: true,
       slides: this.slides,
+      highlightSelection,
     });
   }
 
-  render() {
-    const sx = this.getStyles();
+  getHighlighter({ slideSize, trackOffset }) {
+    const {
+      vertical,
+      variableSize,
+      highlightSelection,
+      selectedSlideOffset,
+      pageLength,
+    } = this.props;
+
+    if (!highlightSelection) {
+      return null;
+    }
+
+    const fixedWidth = 100 / pageLength;
+    const varWidth = slideSize;
+
+    const parentSize = getSize(vertical, this.trackParent);
+
+    const right =
+      parentSize * selectedSlideOffset +
+      (variableSize ? varWidth : parentSize / pageLength);
+
+    const style = {
+      position: 'absolute',
+      border: '2px solid',
+      width: variableSize ? varWidth + 'px' : fixedWidth + '%',
+      height: '100%',
+      left: 100 * selectedSlideOffset + '%',
+      zIndex: 100,
+    };
 
     return (
-      <div className="carousel-track" style={sx.track}>
+      <Fragment>
         <div
-          className="carousel-slider"
-          style={sx.slider}
-          ref={comp => (this.slider = comp)}
+          className="slide-selector-top"
+          style={{ ...style, ...{ height: 0 } }}
+        />
+        <div
+          className="slide-selector-bottom"
+          style={{ ...style, ...{ height: 0, bottom: 0 } }}
+        />
+        <div
+          className="slide-selector-left"
+          style={{ ...style, ...{ width: 0 } }}
+        />
+        <div
+          className="slide-selector-right"
+          style={{ ...style, ...{ width: 0, left: right + 'px' } }}
+        />
+      </Fragment>
+    );
+  }
+
+  render() {
+    const { sx, slideSize, trackOffset } = this.getStyles();
+    return (
+      <Fragment>
+        <div
+          className="carousel-track"
+          style={sx.track}
+          ref={comp => (this.track = comp)}
         >
-          {this.getChildren(sx)}
+          {this.getHighlighter({ slideSize, trackOffset })}
+          <div
+            className="carousel-slider"
+            style={sx.slider}
+            ref={comp => (this.slider = comp)}
+          >
+            {this.getChildren(sx)}
+          </div>
         </div>
-      </div>
+      </Fragment>
     );
   }
 }
@@ -263,6 +368,7 @@ Slider.propTypes = {
   speed: PropTypes.number.isRequired,
   vertical: PropTypes.bool,
   handleTransitionEnd: PropTypes.func.isRequired,
+  highlightSelection: PropTypes.bool,
 };
 
 Slider.defaultProps = {
@@ -271,6 +377,7 @@ Slider.defaultProps = {
   infinite: true,
   speed: 300,
   vertical: false,
+  highlightSelection: false,
 };
 
 export default Slider;

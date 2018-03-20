@@ -3,8 +3,9 @@ import React from 'react';
 const sxCarouselWrapper = {
   position: 'relative',
   overflow: 'hidden',
-  padding: '20px 0',
   outline: 'none',
+  width: '100%',
+  // height: '100%',
 };
 
 const sxNav = {
@@ -113,6 +114,13 @@ class CarouselControls extends React.Component {
     }
   };
 
+  componentWillReceiveProps(nextProps) {
+    const { setfocus } = nextProps;
+    if (setfocus) {
+      this.comp.focus();
+    }
+  }
+
   render() {
     const { previous, next, vertical, children } = this.props;
 
@@ -125,10 +133,11 @@ class CarouselControls extends React.Component {
       <div
         className="carouselWrapper"
         style={sxCarouselWrapper}
-        tabIndex="0"
+        // tabIndex="0"
         onKeyDown={e => {
           this.handleKeyPress(e);
         }}
+        ref={comp => (this.comp = comp)}
       >
         {children}
         <NavButton onClickHandler={previous} classes={btnClasses.previous} />

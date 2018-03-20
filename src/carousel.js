@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Slider from './slider';
-import CarouselControls from './carousel-controls';
 
 function CarouselStateHOC(Controls) {
   class Carousel extends React.Component {
@@ -13,12 +12,17 @@ function CarouselStateHOC(Controls) {
       this.animating = false;
     }
 
+    updateState({ index, speed }) {
+      const { updateIndexCb } = this.props;
+      this.setState({ index, speed }, updateIndexCb(index));
+    }
+
     componentDidMount() {
       const { autoplay, autoplayTimeout } = this.props;
       if (autoplay) {
         this.autoplayTimer = setInterval(() => this.next(), autoplayTimeout);
       }
-      this.setState({ index: 0, speed: 0 });
+      this.updateState({ index: 0, speed: 0 });
     }
 
     componentWillUnmount() {
@@ -35,7 +39,7 @@ function CarouselStateHOC(Controls) {
 
       this.animating = false;
       if (Math.abs(index) >= length) {
-        this.setState({ index: index % length, speed: 0 });
+        this.updateState({ index: index % length, speed: 0 });
       }
     };
 
@@ -55,7 +59,7 @@ function CarouselStateHOC(Controls) {
         }
       }
 
-      this.setState({ index, speed });
+      this.updateState({ index, speed });
       this.animating = true;
     };
 
@@ -70,11 +74,16 @@ function CarouselStateHOC(Controls) {
     };
 
     render() {
-      const { children, vertical } = this.props;
+      const { children, vertical, setfocus } = this.props;
       const { index, speed } = this.state;
 
       return (
-        <Controls vertical={vertical} previous={this.previous} next={this.next}>
+        <Controls
+          vertical={vertical}
+          previous={this.previous}
+          next={this.next}
+          setfocus={setfocus}
+        >
           <Slider
             {...this.props}
             index={index}
@@ -96,6 +105,7 @@ function CarouselStateHOC(Controls) {
     autoplay: PropTypes.bool,
     autoplayTimeout: PropTypes.number,
     vertical: PropTypes.bool,
+    updateIndexCb: PropTypes.func,
   };
 
   Carousel.defaultProps = {
@@ -105,6 +115,7 @@ function CarouselStateHOC(Controls) {
     speed: 300,
     autoplayTimeout: 3000,
     vertical: false,
+    updateIndexCb: () => null,
   };
 
   return Carousel;
