@@ -161,7 +161,7 @@ class Slider extends React.Component {
       vertical,
       selectedSlideOffset,
     } = this.props;
-    const length = children.length;
+    const length = children.length || 1;
     const added = length; // TODO: should depend on slide size (width, height)
 
     let prefixSize = 0;
@@ -195,7 +195,9 @@ class Slider extends React.Component {
 
     offset = index < 0 ? prefixSize + offset : prefixSize - offset;
 
-    const slideSize = this.slides ? getSize(vertical, this.slides[index]) : 0;
+    const slideSize = this.slides
+      ? getSize(vertical, this.slides[index < 0 ? length + index : index])
+      : 0;
     return {
       offset,
       trackSize: totalSize ? `${totalSize + trackOffset}px` : '100%',

@@ -14,15 +14,21 @@ function CarouselStateHOC(Controls) {
 
     updateState({ index, speed }) {
       const { updateIndexCb } = this.props;
-      this.setState({ index, speed }, updateIndexCb(index));
+      const { children } = this.props;
+      const length = children.length;
+
+      this.setState(
+        { index, speed },
+        updateIndexCb(index >= 0 ? index : length + index)
+      );
     }
 
     componentDidMount() {
-      const { autoplay, autoplayTimeout } = this.props;
+      const { startIndex, autoplay, autoplayTimeout } = this.props;
       if (autoplay) {
         this.autoplayTimer = setInterval(() => this.next(), autoplayTimeout);
       }
-      this.updateState({ index: 0, speed: 0 });
+      this.updateState({ index: startIndex, speed: 0 });
     }
 
     componentWillUnmount() {
@@ -44,8 +50,7 @@ function CarouselStateHOC(Controls) {
     };
 
     updateIndex = newIndex => {
-      const { infinite, speed } = this.props;
-      const { children } = this.props;
+      const { infinite, speed, children } = this.props;
       const length = children.length;
 
       if (this.animating) {
@@ -98,6 +103,7 @@ function CarouselStateHOC(Controls) {
   }
 
   Carousel.propTypes = {
+    startIndex: PropTypes.number,
     slidesToScroll: PropTypes.number,
     infinite: PropTypes.bool,
     variableSize: PropTypes.bool.isRequired,
@@ -109,6 +115,7 @@ function CarouselStateHOC(Controls) {
   };
 
   Carousel.defaultProps = {
+    startIndex: 0,
     slidesToScroll: 1,
     infinite: true,
     variableSize: false,
