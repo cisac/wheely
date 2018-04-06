@@ -31,6 +31,20 @@ const CarouselTest = () => {
   );
 };
 ```
+Props
+-
+Prop | Default | Description
+-----|---------|------------
+autoplay|false| Enable autoplay
+autoplayTimeout|3000| Autoplay timeout
+infinite|false|Infinite loop sliding
+startIndex|0| Slide to start
+slidesToScroll|1| Slides to scroll
+speed|300| Animation speed
+updateIndexCb|(index) => null| Callback fired after scrolling 
+variableSize|false| Variable slide size
+vertical|false| Vertical
+
 
 Contributing
 -
