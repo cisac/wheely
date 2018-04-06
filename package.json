@@ -1,6 +1,6 @@
 {
   "name": "wheely",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "React carousel component",
   "main": "lib/index.js",
   "module": "es/index.js",
